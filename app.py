@@ -12,7 +12,14 @@ from skimage.feature import graycomatrix, graycoprops
 # ==========================================
 st.set_page_config(page_title="Council of AI - Melanoma HAM10000", layout="wide", page_icon="🧬")
 
-# Custom Styling agar tampilan kartu seperti Web Enterprise
+st.markdown("""
+<style>
+    span.besarin {
+        font-size: 24px !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.markdown("""
     <style>
     .big-font {font_size: 20px !important; font-weight: bold;}
@@ -179,12 +186,10 @@ if uploaded:
     scaled_vector = robust_scaler.transform(vector_35)
     
     # Baris Preview Gambar
-    c1, c2, c3 = st.columns([1, 1, 1.5])
+    c1, c2 = st.columns([1, 1])
     with c1: 
         st.image(raw_pil, caption="Citra Mentah (Input)", use_container_width=True)
-    with c2: 
-        st.image(mask_224, caption="Area Lesi Terisolasi (Otsu)", use_container_width=True)
-    with c3:
+    with c2:
         st.write("#### 📋 Status Pemindaian")
         st.success("✅ **Citra berhasil dibersihkan** dari noise (rambut/pantulan).")
         st.success("✅ **35 Titik Fitur berhasil diekstrak** untuk dianalisis oleh mesin.")
@@ -216,23 +221,44 @@ if uploaded:
     is_final_cancer = accumulated_prob >= master_threshold
 
     # ==========================================
-    # 6. PANEL KEPUTUSAN FINAL (DENGAN PENJELASAN AWAM)
+    # 6. PANEL KEPUTUSAN FINAL 
     # ==========================================
     st.subheader("📊 Keputusan Akhir Sistem (Akumulasi 3 Mesin)")
     
     if is_final_cancer:
         st.error(f"### 🚨 TERDETEKSI INDIKASI MENCURIGAKAN")
-        st.write(f"Berdasarkan diskusi dari 3 sistem AI, gambar ini memiliki **tingkat kecurigaan gabungan sebesar {accumulated_prob*100:.2f}%** (melewati batas aman yang ditetapkan: {master_threshold*100:.0f}%).")
+        st.markdown(
+            f"""
+            <div style="background-color: #12548a; border: 1px solid #30363D; padding: 15px; border-radius: 10px;">
+                Berdasarkan diskusi dari 3 sistem AI, gambar ini memiliki 
+                <span class='besarin'><b>tingkat kecurigaan gabungan sebesar {accumulated_prob*100:.2f}%</b></span> 
+                (melewati batas aman yang ditetapkan: {master_threshold*100:.0f}%).
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        st.write("")
         st.write("**Penjelasan Medis:** Sistem menemukan adanya ketidakteraturan pada sebaran warna kulit (fitur HSV) atau kekasaran permukaan tahi lalat (fitur GLCM) yang menyerupai pola keganasan. **Tindakan yang Disarankan:** Segera jadwalkan pemeriksaan lanjutan dengan dokter spesialis kulit untuk memastikan.")
     else:
         st.success(f"### ✅ TIDAK TERDETEKSI KEGANASAN (JINAK)")
-        st.write(f"Berdasarkan diskusi dari 3 sistem AI, gambar ini memiliki **tingkat kecurigaan gabungan sebesar {accumulated_prob*100:.2f}%** (masih di bawah batas bahaya: {master_threshold*100:.0f}%).")
+
+        st.markdown(
+            f"""
+            <div style="background-color: #12548a; border: 1px solid #30363D; padding: 15px; border-radius: 10px;">
+                Berdasarkan diskusi dari 3 sistem AI, gambar ini memiliki 
+                <span class='besarin'><b>tingkat kecurigaan gabungan sebesar {accumulated_prob*100:.2f}%</b></span> 
+                (melewati batas aman yang ditetapkan: {master_threshold*100:.0f}%).
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        st.write("")
         st.write("**Penjelasan Medis:** Bentuk, warna, dan tekstur gambar ini sejalan dengan profil tahi lalat normal/jinak. Sistem tidak menemukan pola yang berbahaya. **Tindakan yang Disarankan:** Tetap pantau jika terjadi perubahan bentuk, warna, atau ukuran secara drastis di kemudian hari.")
 
     st.write("") # Spacer
 
     # ==========================================
-    # 7. RINCIAN PER MESIN (TEKNIS + ANALOGI AWAM)
+    # 7. RINCIAN PER MESIN
     # ==========================================
     st.markdown("##### Bagaimana Masing-Masing Mesin Menilai Gambar Ini?")
     col_et, col_xgb, col_svm = st.columns(3)
@@ -363,12 +389,21 @@ if uploaded:
     with tab_teknis:
         st.info("💡 **Log Operasional:** Menampilkan parameter latar belakang dan matriks ekstraksi mentah.")
         c_deb1, c_deb2 = st.columns([1, 1.2])
+        
         with c_deb1:
             st.write("##### Parameter Skrining")
             st.code(f"Threshold Aktif: {master_threshold}\nMetode: Soft Voting Accumulate\nSegmentasi: Otsu + Telea 11x11", language="yaml")
+            
+            st.write("##### Hasil Segmentasi Otsu (Raw Mask)")
+            st.image(mask_224, caption="Area Lesi Terisolasi (Mesin)", use_container_width=True)
+
         with c_deb2:
             st.write("##### Matriks 35 Fitur Numerik")
             kat_list = ['Warna (HSV)'] * 15 + ['Tekstur (GLCM)'] * 20
-            nm_list = [f'Fitur ke-{i}' for i in range(35)]
-            df_v = pd.DataFrame({'Kategori': kat_list, 'Index': nm_list, 'Nilai': vector_35[0]})
-            st.dataframe(df_v, height=350, use_container_width=True, hide_index=True)
+            
+            df_v = pd.DataFrame({
+                'Kategori': kat_list, 
+                'Indikator Medis': KAMUS_FITUR_35, 
+                'Nilai Metrik': vector_35[0]
+            })
+            st.dataframe(df_v, height=450, use_container_width=True, hide_index=True)
