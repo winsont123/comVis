@@ -2,19 +2,26 @@
 
 Repositori ini berisi *source code* untuk Proyek Akhir mata kuliah **Computer Vision**. Proyek ini merupakan aplikasi berbasis antarmuka web (Streamlit) yang menggunakan metode *Ensemble* (XGBoost, Extra Trees, SVM) untuk mengklasifikasikan lesi kulit (Melanoma vs Non-Melanoma) berdasarkan ekstraksi 35 fitur warna (HSV) dan tekstur (GLCM). Aplikasi mencakup pra-pemrosesan mandiri seperti *Hair Removal* (Black-Hat) dan segmentasi otomatis (Otsu).
 
-## Struktur Direktori
+## 📁 Struktur Direktori
 ```text
 comVis/
-├── Training_Melanoma.ipynb      # Notebook berisi seluruh alur dari pra-pemrosesan hingga evaluasi model akhir
-├── app.py                       # Skrip utama antarmuka Streamlit (Termasuk logika ekstraksi 35 fitur)
-├── requirements.txt             # Daftar dependensi library
-├── XGBoost_Model.pkl            # Model pra-latih XGBoost
-├── Extra_Trees_Model.pkl        # Model pra-latih Extra Trees
-├── SVM_Model.pkl                # Model pra-latih Support Vector Machine
-└── RobustScaler_35.pkl          # Scaler pra-latih untuk normalisasi data
+├── Training_Melanoma.ipynb         # Notebook berisi seluruh alur dari pra-pemrosesan hingga evaluasi akhir
+├── app.py                          # Skrip utama antarmuka Streamlit (Termasuk logika ekstraksi 35 fitur)
+├── requirements.txt                # Daftar dependensi library
+├── XGBoost_Model.pkl               # Model pra-latih XGBoost
+├── Extra_Trees_Model.pkl           # Model pra-latih Extra Trees
+├── SVM_Model.pkl                   # Model pra-latih Support Vector Machine
+├── RobustScaler_35.pkl             # Scaler pra-latih untuk normalisasi data
+└── extracted_features_35_Tuned.csv # Dataset tabular berisi 35 fitur (HSV & GLCM)
 
-# Catatan Penting Terkait Reproduksibilitas (Reproducibility Notes)
-Untuk memastikan hasil evaluasi (Akurasi, Confusion Matrix, ROC/AUC) yang didapat saat dosen penguji menjalankan kode di notebook sama persis dengan metrik yang tertera pada Laporan Proyek, mohon perhatikan panduan berikut:
-1. Hindari Menjalankan Ulang Blok Pre-Processing dan Data Splitting: Pembacaan gambar awal memiliki sifat acak yang bergantung pada Sistem Operasi. Perbedaan urutan baca file ini akan menggeser komposisi train/val/test split, sehingga hasil akhir model akan berbeda dari laporan.
-2. Gunakan Dataset Tabular (CSV) yang Telah Disediakan: Untuk melatih ulang model dari awal namun dengan hasil yang 100% identik dengan laporan, silakan langsung eksekusi Training_Melanoma.ipynb dimulai dari blok "Training and Evaluasi". Sistem akan otomatis menggunakan file ekstraksi fitur asli yang sudah disiapkan.
-3. Pengujian Aplikasi (Quick Test): Jika tujuan utamanya adalah untuk melihat output aplikasi dan melakukan klasifikasi gambar lesi kulit baru secara real-time, silakan abaikan notebook dan langsung jalankan antarmuka Streamlit (petunjuk di bawah).
+Lingkungan Eksekusi (Google Colab & Drive)
+Eksperimen pemodelan Machine Learning dalam proyek ini (Training_Melanoma.ipynb) dirancang untuk dieksekusi secara optimal menggunakan Google Colab yang terhubung langsung dengan Google Drive. Jika Anda ingin menguji kode pada notebook tersebut:
+1. Pastikan seluruh file pendukung (Dataset CSV, Folder Model, dan Folder Hasil Evaluasi) telah diunggah ke Google Drive Anda.
+2. Ubah path direktori pada variabel csv_path dan path_simpan di dalam blok kode agar sesuai dengan lokasi penyimpanan Google Drive Anda (misal: /content/drive/MyDrive/...).
+
+Isu Reproduksibilitas
+1. Untuk memastikan hasil evaluasi model (Akurasi, Confusion Matrix, Feature Importance, dll.) yang didapat saat menjalankan kode di notebook sama persis 100% dengan metrik yang tertera pada Laporan Proyek, mohon perhatikan panduan berikut:
+2. Kendala Randomness OS: Proses ekstraksi fitur langsung dari gambar mentah rentan terhadap keacakan (randomness) tingkat sistem operasi saat membaca urutan file. Jika blok Pre-Processing dan Data Splitting dijalankan ulang, komposisi distribusi data train/val/test akan bergeser dan mengubah hasil akhir training, meskipun parameter random_state=42 telah dikonfigurasi.
+3. Gunakan Dataset Tabular (CSV): Untuk menghindari isu tersebut, kami telah menyediakan dataset tabular berisi 35 fitur (HSV & GLCM) yang sudah dibekukan secara permanen dalam bentuk CSV (extracted_features_35_Tuned.csv).
+4. Instruksi Eksekusi: Mohon JANGAN menjalankan ulang blok Pre-Processing, Data Splitting, dan Ekstraksi 35 Fitur. Silakan langsung mulai pengeksekusian notebook dari blok "Training and Evaluasi" ke bawah. Sistem akan otomatis memuat file CSV tersebut untuk menjamin reproduksibilitas hasil yang identik.
+5. Pengujian Aplikasi (Quick Test): Jika tujuan utamanya adalah untuk melihat output aplikasi dan melakukan klasifikasi gambar lesi kulit baru secara real-time, silakan abaikan notebook dan langsung jalankan antarmuka Streamlit.
