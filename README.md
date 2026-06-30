@@ -9,6 +9,19 @@ Model memanfaatkan **35 fitur** yang diekstraksi dari karakteristik **warna (HSV
 - Ekstraksi fitur HSV dan GLCM
 - Prediksi menggunakan model Ensemble
 
+## 🔗 Demo
+
+- **Aplikasi Streamlit:** https://comvis-melanoma.streamlit.app/
+- **Video Demonstrasi:** https://youtu.be/XQxnaVhvXJE
+
+## 📌 Project Highlights
+
+- Ensemble Voting menggunakan XGBoost, Extra Trees, dan SVM
+- Ekstraksi 35 fitur warna (HSV) dan tekstur (GLCM)
+- Pipeline pemrosesan citra otomatis (Hair Removal & Otsu Segmentation)
+- Aplikasi web interaktif menggunakan Streamlit
+- Pelatihan dan evaluasi model menggunakan scikit-learn
+
 ---
 
 # 📁 Struktur Direktori
